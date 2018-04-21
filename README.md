@@ -1,2 +1,4 @@
-You can use these plugins in your commercials and non-commercials as long you credit me and link my blog (gladiocitrico.blogspot.com) or site (hermespasser.github.io).
-The plugins that you can not use are explicit in READMEs of subfolders.
+#RMMV Plugins
+Plugins for the RPG Maker MV.
+
+See also Scripts for RPG Maker XP-Ace [here](https://github.com/HermesPasser/RGSS-Scripts).

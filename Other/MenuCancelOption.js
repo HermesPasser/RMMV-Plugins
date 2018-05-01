@@ -1,5 +1,5 @@
 //=============================================================================
-// Menu Cancel Option.js 0.2
+// Menu Cancel Option.js 0.3
 // by Hermes Passer (hermespasser@gmail.com)
 // hermespasser.github.io / gladiocitrico.blogspot.com
 //=============================================================================
@@ -265,4 +265,19 @@
 	}
 	
 	// ------- End Game Already Have
+	
+	// ------- Load
+	
+	var alias_LoadInitialize = Scene_Load.prototype.initialize;
+	Scene_Load.prototype.initialize = function() {
+		alias_LoadInitialize.call(this);
+		this.createWindowCancel();
+		canCancel = false;
+	};
+
+	Scene_Load.prototype.createWindowCancel = function() {
+		this.windowCancel = new Window_StatusCancel(Graphics.boxWidth - 244, 0, 0);
+		this.windowCancel.setHandler(cancelCmd, this.popScene.bind(this));	
+		this.addChild(this.windowCancel);
+	}
 })();

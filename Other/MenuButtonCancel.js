@@ -1,5 +1,5 @@
 //=============================================================================
-// Menu Button Option.js 0.3
+// Menu Button Cancel.js 0.3
 // by Hermes Passer (hermespasser@gmail.com)
 // hermespasser.github.io / gladiocitrico.blogspot.com
 //=============================================================================

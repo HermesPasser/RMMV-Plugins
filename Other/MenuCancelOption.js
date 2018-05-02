@@ -1,11 +1,11 @@
 //=============================================================================
-// Menu Cancel Option.js 0.3
+// Menu Cancel Option.js 0.4
 // by Hermes Passer (hermespasser@gmail.com)
 // hermespasser.github.io / gladiocitrico.blogspot.com
 //=============================================================================
 
 /*:
- * @plugindesc Add cancel option to menus and remove "double touch" to cancel menus.
+ * @plugindesc Add cancel option in menus.
  * @author Hermes Passer
  
  * @param Cancel Text
@@ -15,11 +15,11 @@
  * @help
  * Written to RMMV 1.3.3
  * The name of the file must be MenuCancelOption.js.
- * This plugin is made to work on devices with touch screen and can not work properly in desktop devices.
+ * This plugin is made to work on devices with touch screen and not work in desktop devices.
  */
  
 /*:pt-BR
- * @plugindesc Adiciona a opção de cancelar nos menus e remove o "toque duplo" para cancelar menus.
+ * @plugindesc Adiciona a opção de cancelar nos menus.
  * @author Hermes Passer
  
  * @param Cancel Text
@@ -29,7 +29,7 @@
  * @help
  * Escrito para o RMMV 1.3.3
  * O nome do arquivo deve ser MenuCancelOption.js
- * Esse plugin foi feito para funcionar em dispositivos com tela de toque e pode não funcionar corretamente em desktops.
+ * Esse plugin foi feito para funcionar em dispositivos com tela de toque e não funciona em desktops.
  */
 
 (function(){
@@ -38,68 +38,35 @@
 	var cancelCmd  = 'back';
 	var	canCancel  = true;
 	
-	// ------- Cancel 'cancel touch' on menu
+	// ------- Window Cancel 
 	
-	var alias_InputIsCancelled = TouchInput.isCancelled;
-	TouchInput.isCancelled = function() {
-		 if (canCancel)
-			return alias_InputIsCancelled.call(this);
-	};
-	
-	var alias_MenuStart = Scene_Menu.prototype.start;
-	Scene_Menu.prototype.start = function() {
-		alias_MenuStart.call(this);
-		canCancel = false;
-	};
-	
-	var alias_OptionsStart = Scene_Options.prototype.start;
-	Scene_Options.prototype.start = function() {
-		alias_OptionsStart.call(this);
-		canCancel = false;
-	};
-	
-	var alias_TitleStart = Scene_Title.prototype.start;
-	Scene_Title.prototype.start = function() {
-		alias_TitleStart.call(this);
-		canCancel = true;
-	};
-	
-	var alias_MapStart = Scene_Map.prototype.start;
-	Scene_Map.prototype.start = function() {
-		alias_MapStart.call(this);
-		canCancel = true;
-	};
-	
-	// ------- Menu
-	
-	
-	function Window_StatusCancel(x, y, op) {
+	function Window_Cancel(x, y, op) {
 		this.initialize.apply(this, arguments);
 	}
 
-	Window_StatusCancel.prototype = Object.create(Window_HorzCommand.prototype);
-	Window_StatusCancel.prototype.constructor = Window_StatusCancel;
+	Window_Cancel.prototype = Object.create(Window_HorzCommand.prototype);
+	Window_Cancel.prototype.constructor = Window_Cancel;
 
-	Window_StatusCancel.prototype.initialize = function() {
+	Window_Cancel.prototype.initialize = function() {
 		Window_HorzCommand.prototype.initialize.call(this, arguments[0], arguments[1]);
 		this.opacity = arguments[2];
 		this.open();
 	};
 	
-	Window_StatusCancel.prototype.maxCols = function() {
+	Window_Cancel.prototype.maxCols = function() {
 		return 1;
 	};
 	
-	Window_StatusCancel.prototype.makeCommandList = function() {
+	Window_Cancel.prototype.makeCommandList = function() {
 		this.addCommand(cancelText, cancelCmd);
 	}
 	
-	Window_StatusCancel.prototype.activate = function() {
+	Window_Cancel.prototype.activate = function() {
 		Window_HorzCommand.prototype.activate.call(this);
 		this.visible = true;
 	}
 	
-	Window_StatusCancel.prototype.deactivate = function() {
+	Window_Cancel.prototype.deactivate = function() {
 		Window_HorzCommand.prototype.deactivate.call(this);
 		this.visible = false;
 	}
@@ -177,7 +144,7 @@
 	var alias_StatusCreate = Scene_Status.prototype.create;
 	Scene_Status.prototype.create = function() {
 		alias_StatusCreate.call(this);		
-		this.windowCancel = new Window_StatusCancel(Graphics.boxWidth - 244, 0, 0);
+		this.windowCancel = new Window_Cancel(Graphics.boxWidth - 244, 0, 0);
 		this.windowCancel.setHandler(cancelCmd, this.popScene.bind(this));
 		this.addChild(this.windowCancel);
 	};
@@ -191,7 +158,7 @@
 	};
 	
 	Scene_Menu.prototype.createWindowCancel = function() {
-		this.windowCancel = new Window_StatusCancel(0, 360, 255);
+		this.windowCancel = new Window_Cancel(0, 360, 255);
 		this.windowCancel.setHandler(cancelCmd, this.onPersonalCancel.bind(this));
 		this.windowCancel.deactivate();		
 		this.addChild(this.windowCancel);
@@ -259,7 +226,7 @@
 	};
 
 	Scene_File.prototype.createWindowCancel = function() {
-		this.windowCancel = new Window_StatusCancel(Graphics.boxWidth - 244, 0, 0);
+		this.windowCancel = new Window_Cancel(Graphics.boxWidth - 244, 0, 0);
 		this.windowCancel.setHandler(cancelCmd, this.popScene.bind(this));	
 		this.addChild(this.windowCancel);
 	}
@@ -276,7 +243,7 @@
 	};
 
 	Scene_Load.prototype.createWindowCancel = function() {
-		this.windowCancel = new Window_StatusCancel(Graphics.boxWidth - 244, 0, 0);
+		this.windowCancel = new Window_Cancel(Graphics.boxWidth - 244, 0, 0);
 		this.windowCancel.setHandler(cancelCmd, this.popScene.bind(this));	
 		this.addChild(this.windowCancel);
 	}

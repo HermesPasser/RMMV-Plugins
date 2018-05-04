@@ -1,46 +1,79 @@
 //=============================================================================
-// Menu Cancel Option.js 0.4
+// Menu Button Cancel.js 0.3
 // by Hermes Passer (hermespasser@gmail.com)
 // hermespasser.github.io / gladiocitrico.blogspot.com
 //=============================================================================
 
 /*:
- * @plugindesc Add cancel option in menus.
+ * @plugindesc Add a cancel button to menus and remove "double touch" to cancel menus.
  * @author Hermes Passer
  
- * @param Cancel Text
- * @desc Cancel option text.
- * @default Back
+ * @param Image
+ * @desc Image (75x75) name of button, if is none then will not use a image. The image must be in system folder and should not contains the extension.
+ * @default none
  
  * @help
- * Written to RMMV 1.3.3
- * The name of the file must be MenuCancelOption.js.
+ * Written to RMMV 1.5
  * This plugin is made to work on devices with touch screen and not work in desktop devices.
+ * The name of this file must be MenuButtonCancel.js
  */
  
 /*:pt-BR
- * @plugindesc Adiciona a opção de cancelar nos menus.
+ * @plugindesc Adiciona um botão de cancelar nos menus e remove o "toque duplo" para cancelar menus.
  * @author Hermes Passer
  
- * @param Cancel Text
- * @desc Texto da opção de cancelar.
- * @default Back
+ * @param Image
+ * @desc Nome da imagem (75x75) para servir de botão,se permanecer none então ele não usará uma. Precisa estar na pasta system e não deve conter uma extensão.
+ * @default none
  
  * @help
- * Escrito para o RMMV 1.3.3
- * O nome do arquivo deve ser MenuCancelOption.js
- * Esse plugin foi feito para funcionar em dispositivos com tela de toque e não funciona em desktops.
+ * Escrito para o RMMV 1.5
+ * Esse plugin foi feito para funcionar em dispositivos com tela de toque e  não funciona em desktops.
+ * O nome desse arquivo precisa ser MenuButtonCancel.js
  */
 
 (function(){
-	var parameters = PluginManager.parameters('MenuCancelOption');
-	var	cancelText = String(parameters['Cancel Text'] || 'Back');
+	var parameters = PluginManager.parameters('MenuButtonCancel');
+	var	imageName  = String(parameters['Image'] || 'none');
+	var	cancelText = "↵";
 	var cancelCmd  = 'back';
 	var	canCancel  = true;
 	
+	// ------- Cancel 'cancel touch' on menu
+	
+	var alias_SelectableProcessCancel = Window_Selectable.prototype.processCancel;
+	Window_Selectable.prototype.processCancel = function() {
+		if (canCancel)
+			return alias_SelectableProcessCancel.call(this);
+	};
+
+	var alias_MenuStart = Scene_Menu.prototype.start;
+	Scene_Menu.prototype.start = function() {
+		alias_MenuStart.call(this);
+		canCancel = false;
+	};
+	
+	var alias_OptionsStart = Scene_Options.prototype.start;
+	Scene_Options.prototype.start = function() {
+		alias_OptionsStart.call(this);
+		canCancel = false;
+	};
+	
+	var alias_TitleStart = Scene_Title.prototype.start;
+	Scene_Title.prototype.start = function() {
+		alias_TitleStart.call(this);
+		canCancel = true;
+	};
+	
+	var alias_MapStart = Scene_Map.prototype.start;
+	Scene_Map.prototype.start = function() {
+		alias_MapStart.call(this);
+		canCancel = true;
+	};
+	
 	// ------- Window Cancel 
 	
-	function Window_Cancel(x, y, op) {
+	function Window_Cancel() {
 		this.initialize.apply(this, arguments);
 	}
 
@@ -48,109 +81,63 @@
 	Window_Cancel.prototype.constructor = Window_Cancel;
 
 	Window_Cancel.prototype.initialize = function() {
-		Window_HorzCommand.prototype.initialize.call(this, arguments[0], arguments[1]);
-		this.opacity = arguments[2];
+		Window_HorzCommand.prototype.initialize.call(this, Graphics.boxWidth - 100, Graphics.boxHeight - 100);
+		this.z = 50;
+		this.width  = 75;
+		this.height = 75;
+		this.createButton();
 		this.open();
+	};
+	
+	Window_Cancel.prototype.createButton = function(){
+		if (imageName !== "none"){
+			this.opacity = 0;
+			this.buttonBmp = new Sprite(ImageManager.loadSystem(imageName));
+			this.buttonBmp.opacity = 150;
+			this.addChild(this.buttonBmp);
+			return;
+		}
+		this.opacity = 100;
+	};
+	
+	Window_Cancel.prototype.isCursorVisible = function() {
+		return false;
+	};
+	
+	Window_Cancel.prototype.itemTextAlign = function() {
+		return 'left';
 	};
 	
 	Window_Cancel.prototype.maxCols = function() {
 		return 1;
 	};
-	
+
 	Window_Cancel.prototype.makeCommandList = function() {
 		this.addCommand(cancelText, cancelCmd);
-	}
+	};
 	
 	Window_Cancel.prototype.activate = function() {
 		Window_HorzCommand.prototype.activate.call(this);
 		this.visible = true;
-	}
+	};
 	
 	Window_Cancel.prototype.deactivate = function() {
 		Window_HorzCommand.prototype.deactivate.call(this);
 		this.visible = false;
-	}
+	};
 	
+	Window_Cancel.prototype.update = function() {
+		Window_HorzCommand.prototype.update.call(this);
+		
+	};
+	
+	Window_Cancel.prototype.drawIcon = function(iconIndex, x, y) {
+		this._bitmap_ = new Sprite(ImageManager.loadSystem('back'));
+		this.addChild(this._bitmap_);
+	};
+
 	// ------- Menu
 	
-	var alias_MenuCommandMakeCommandList = Window_MenuCommand.prototype.makeCommandList;
-	Window_MenuCommand.prototype.makeCommandList = function() {
-		alias_MenuCommandMakeCommandList.call(this);
-		this.addCommand(cancelText, cancelCmd, true);
-	};
-	
-	var alias_MenuCreateCommandWindow = Scene_Menu.prototype.createCommandWindow;
-	Scene_Menu.prototype.createCommandWindow = function() {
-		alias_MenuCreateCommandWindow.call(this);
-		this._commandWindow.setHandler(cancelCmd, this.popScene.bind(this));
-		this.addWindow(this._commandWindow);
-	};
-	
-	// ------- Item
-	
-	Window_ItemCategory.prototype.windowHeight = function() {
-		return 100;
-	};
-
-	var alias_ItemCategoryMakeCommandList = Window_ItemCategory.prototype.makeCommandList;
-	Window_ItemCategory.prototype.makeCommandList = function() {
-		alias_ItemCategoryMakeCommandList.call(this);
-		this.addCommand(cancelText, cancelCmd);
-	};
-	
-	var alias_ItemCreateCategoryWindow = Scene_Item.prototype.createCategoryWindow;
-	Scene_Item.prototype.createCategoryWindow = function() {
-		alias_ItemCreateCategoryWindow.call(this);
-		this._categoryWindow.setHandler(cancelCmd, this.popScene.bind(this));
-		this.addWindow(this._categoryWindow);
-	};
-	
-	// ------- Skill
-	
-	var alias_SkillTypeMakeCommandList = Window_SkillType.prototype.makeCommandList;
-	Window_SkillType.prototype.makeCommandList = function() {
-		alias_SkillTypeMakeCommandList.call(this);
-		this.addCommand(cancelText, cancelCmd);
-	};
-	
-	var alias_SkillCreateSkillTypeWindow = Scene_Skill.prototype.createSkillTypeWindow;
-	Scene_Skill.prototype.createSkillTypeWindow = function() {
-		alias_SkillCreateSkillTypeWindow.call(this);
-		this._skillTypeWindow.setHandler(cancelCmd, this.popScene.bind(this));
-		this.addWindow(this._skillTypeWindow);
-	};
-	
-	// ------- Equip
-	
-	Window_EquipCommand.prototype.windowHeight = function() {
-		return 100;
-	};
-	
-	var alias_EquipCommandMakeCommandList = Window_EquipCommand.prototype.makeCommandList;
-	Window_EquipCommand.prototype.makeCommandList = function() {
-		alias_EquipCommandMakeCommandList.call(this);
-		this.addCommand(cancelText, cancelCmd, true);
-	};
-
-	var alias_EquipCreateCommandWindow = Scene_Equip.prototype.createCommandWindow;
-	Scene_Equip.prototype.createCommandWindow = function() {
-		alias_EquipCreateCommandWindow.call(this);
-		this._commandWindow.setHandler(cancelCmd, this.popScene.bind(this));
-		this.addWindow(this._commandWindow);
-	};
-	
-	// ------- Status
-
-	var alias_StatusCreate = Scene_Status.prototype.create;
-	Scene_Status.prototype.create = function() {
-		alias_StatusCreate.call(this);		
-		this.windowCancel = new Window_Cancel(Graphics.boxWidth - 244, 0, 0);
-		this.windowCancel.setHandler(cancelCmd, this.popScene.bind(this));
-		this.addChild(this.windowCancel);
-	};
-	
-	// ------- Formation
-
 	var alias_MenuCreate = Scene_Menu.prototype.create;
 	Scene_Menu.prototype.create = function() {
 		alias_MenuCreate.call(this);
@@ -158,35 +145,66 @@
 	};
 	
 	Scene_Menu.prototype.createWindowCancel = function() {
-		this.windowCancel = new Window_Cancel(0, 360, 255);
-		this.windowCancel.setHandler(cancelCmd, this.onPersonalCancel.bind(this));
-		this.windowCancel.deactivate();		
+		this.windowCancel = new Window_Cancel();
+		this.OnCancelPop = true;
+		this.windowCancel.setHandler(cancelCmd, this.popScene.bind(this));
+		this.addChild(this.windowCancel);
+	}
+
+	// ------- Item
+	
+	var alias_ItemCreateCategoryWindow = Scene_Item.prototype.createCategoryWindow;
+	Scene_Item.prototype.createCategoryWindow = function() {
+		alias_ItemCreateCategoryWindow.call(this);
+		this.createWindowCancel();
+	};
+	
+	Scene_Item.prototype.createWindowCancel = function() {
+		this.windowCancel = new Window_Cancel();
+		this.windowCancel.setHandler(cancelCmd, this.popScene.bind(this));
 		this.addChild(this.windowCancel);
 	}
 	
-	var alias_MenuCommandPersonal = Scene_Menu.prototype.commandPersonal;
-	Scene_Menu.prototype.commandPersonal = function() {
-		alias_MenuCommandPersonal.call(this);
-		this.windowCancel.activate();
+	// ------- Skill
+	
+	var alias_SkillCreate = Scene_Skill.prototype.create;
+	Scene_Skill.prototype.create = function() {
+		alias_SkillCreate.call(this);
+		this.createWindowCancel();
 	};
+	
+	Scene_Skill.prototype.createWindowCancel = function() {
+		this.windowCancel = new Window_Cancel();
+		this.windowCancel.setHandler(cancelCmd, this.popScene.bind(this));
+		this.addChild(this.windowCancel);
+	}
+	// ------- Equip
+	
+	var alias_EquipCreate = Scene_Equip.prototype.create;
+	Scene_Equip.prototype.create = function() {
+		alias_EquipCreate.call(this);
+		this.createWindowCancel();
+	};
+		
+	Scene_Equip.prototype.createWindowCancel = function() {
+		this.windowCancel = new Window_Cancel();
+		this.windowCancel.setHandler(cancelCmd, this.popScene.bind(this));
+		this.addChild(this.windowCancel);
+	}
+	
+	// ------- Status
 
-	var alias_MenuCommandFormation = Scene_Menu.prototype.commandFormation;
-	Scene_Menu.prototype.commandFormation = function() {
-		alias_MenuCommandFormation.call(this);
-		this.windowCancel.activate();
+	var alias_StatusCreate = Scene_Status.prototype.create;
+	Scene_Status.prototype.create = function() {
+		alias_StatusCreate.call(this);
+		this.createWindowCancel();
 	};
-
-	var alias_MenuOnPersonalCancel = Scene_Menu.prototype.onPersonalCancel;
-	Scene_Menu.prototype.onPersonalCancel = function() {
-		alias_MenuOnPersonalCancel.call(this);
-		this.windowCancel.deactivate();
-	};
-
-	var alias_MenuOnFormationCancel = Scene_Menu.prototype.onFormationCancel;
-	Scene_Menu.prototype.onFormationCancel = function() {
-		alias_MenuOnFormationCancel.call(this);
-		this.windowCancel.deactivate();
-	};
+	
+	Scene_Status.prototype.createWindowCancel = function() {
+		this.windowCancel = new Window_Cancel();
+		this.windowCancel.setHandler(cancelCmd, this.popScene.bind(this));
+		this.addChild(this.windowCancel);
+	}
 
 	// ------- Options
 	
@@ -224,13 +242,13 @@
 		alias_SaveCreate.call(this);
 		this.createWindowCancel();
 	};
-
+	
 	Scene_File.prototype.createWindowCancel = function() {
-		this.windowCancel = new Window_Cancel(Graphics.boxWidth - 244, 0, 0);
-		this.windowCancel.setHandler(cancelCmd, this.popScene.bind(this));	
+		this.windowCancel = new Window_Cancel();
+		this.windowCancel.setHandler(cancelCmd, this.popScene.bind(this));
 		this.addChild(this.windowCancel);
 	}
-	
+
 	// ------- End Game Already Have
 	
 	// ------- Load
@@ -243,8 +261,8 @@
 	};
 
 	Scene_Load.prototype.createWindowCancel = function() {
-		this.windowCancel = new Window_Cancel(Graphics.boxWidth - 244, 0, 0);
-		this.windowCancel.setHandler(cancelCmd, this.popScene.bind(this));	
+		this.windowCancel = new Window_Cancel();
+		this.windowCancel.setHandler(cancelCmd, this.popScene.bind(this));
 		this.addChild(this.windowCancel);
 	}
 })();

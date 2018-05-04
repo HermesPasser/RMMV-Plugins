@@ -8,21 +8,33 @@
  * @plugindesc Add a cancel button to menus and remove "double touch" to cancel menus.
  * @author Hermes Passer
  
+ * @param Image
+ * @desc Image (75x75) name of button, if is none then will not use a image. The image must be in system folder and should not contains the extension.
+ * @default none
+ 
  * @help
- * Written to RMMV 1.3.3
+ * Written to RMMV 1.5
  * This plugin is made to work on devices with touch screen and not work in desktop devices.
+ * The name of this file must be MenuButtonCancel.js
  */
  
 /*:pt-BR
  * @plugindesc Adiciona um botão de cancelar nos menus e remove o "toque duplo" para cancelar menus.
  * @author Hermes Passer
  
+ * @param Image
+ * @desc Nome da imagem (75x75) para servir de botão,se permanecer none então ele não usará uma. Precisa estar na pasta system e não deve conter uma extensão.
+ * @default none
+ 
  * @help
- * Escrito para o RMMV 1.3.3
+ * Escrito para o RMMV 1.5
  * Esse plugin foi feito para funcionar em dispositivos com tela de toque e  não funciona em desktops.
+ * O nome desse arquivo precisa ser MenuButtonCancel.js
  */
 
 (function(){
+	var parameters = PluginManager.parameters('MenuButtonCancel');
+	var	imageName  = String(parameters['Image'] || 'none');
 	var	cancelText = "↵";
 	var cancelCmd  = 'back';
 	var	canCancel  = true;
@@ -70,12 +82,23 @@
 
 	Window_Cancel.prototype.initialize = function() {
 		Window_HorzCommand.prototype.initialize.call(this, Graphics.boxWidth - 100, Graphics.boxHeight - 100);
-		this.opacity = 100;
 		this.z = 50;
 		this.width  = 75;
 		this.height = 75;
+		this.createButton();
 		this.open();
 	};
+	
+	Window_Cancel.prototype.createButton = function(){
+		if (imageName !== "none"){
+			this.opacity = 0;
+			this.buttonBmp = new Sprite(ImageManager.loadSystem(imageName));
+			this.buttonBmp.opacity = 100;
+			this.addChild(this.buttonBmp);
+			return;
+		}
+		this.opacity = 100;
+	}
 	
 	Window_Cancel.prototype.itemTextAlign = function() {
 		return 'left';
@@ -87,18 +110,28 @@
 
 	Window_Cancel.prototype.makeCommandList = function() {
 		this.addCommand(cancelText, cancelCmd);
-	}
+	};
 	
 	Window_Cancel.prototype.activate = function() {
 		Window_HorzCommand.prototype.activate.call(this);
 		this.visible = true;
-	}
+	};
 	
 	Window_Cancel.prototype.deactivate = function() {
 		Window_HorzCommand.prototype.deactivate.call(this);
 		this.visible = false;
-	}
+	};
 	
+	Window_Cancel.prototype.update = function() {
+		Window_HorzCommand.prototype.update.call(this);
+		
+	};
+	
+	Window_Cancel.prototype.drawIcon = function(iconIndex, x, y) {
+		this._bitmap_ = new Sprite(ImageManager.loadSystem('back'));
+		this.addChild(this._bitmap_);
+	};
+
 	// ------- Menu
 	
 	var alias_MenuCreate = Scene_Menu.prototype.create;

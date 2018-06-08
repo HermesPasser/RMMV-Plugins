@@ -29,7 +29,7 @@
 (function() {
 	//------ Game Interpreter
 	
-    var parameters = PluginManager.parameters('SceneBook');
+    var parameters = PluginManager.parameters('SaveName');
 	var configText = String(parameters['config text'] || 'config'); 
 	var globalText = String(parameters['global text'] || 'global'); 
 	var fileText   = String(parameters['file text']   || 'file'); 

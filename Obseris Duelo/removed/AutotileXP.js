@@ -11,6 +11,10 @@
  * @param Terrain Tag
  * @desc Terrain tag to emulate the RM XP autotile.
  * @default 1
+  
+ * @param Terrain below Player
+ * @desc Allow the autotile to be draw below the player. This feacture have bugs and do not work well.
+ * @default false
  
  * @help
  * This plugin file name must be AutotileXP.js
@@ -18,14 +22,18 @@
  */
  
 /*:pt-BR
- * @plugindesc Emule a função de Autotile do RPG Maker XP.
+ * @plugindesc Emula a função de Autotile do RPG Maker XP.
  * @author Hermes Passer 
  *
  * @param Terrain Tag
  * @desc Tag de terreno que servirá para emular o Autotile do RMXP.
  * Padrão: 1
  * @default 1
- *
+  
+ * @param Terrain below Player
+ * @desc Permite que o autotile seja desenhado por cima do jogador. Essa opção tem bugs e não responde bem.
+ * @default false
+ 
  * @help
  * Este arquivo do plugin deve estar nomeado como AutotileXP.js
  * Agradeço a NineK pelo ótimo suporte e ao Daniel M. Neto pela tradução para pt-br.
@@ -33,8 +41,11 @@
  
 (function() {
 	var parameters = PluginManager.parameters('AutotileXP'),
-		terrainTag = String(parameters['Terrain Tag'] || 1);
+		terrainTag = String(parameters['Terrain Tag'] || 1),
+		rePaint	   = String(parameters['Terrain below Player'] || "false");
 
+	var dir = null;
+	
 	// --- Behavior
 	
 	var alias_canPass = Game_CharacterBase.prototype.canPass;
@@ -45,7 +56,7 @@
 			playerPositionTag = $gameMap.terrainTag($gamePlayer.x, $gamePlayer.y),
 			nextPositionTag	  = $gameMap.terrainTag(x2,y2),
 			directions 		  = { down: 2,  left: 4, right: 6, up: 8 };
-
+		
 		// If my position is a autotile so i can't go below
 		if (playerPositionTag == terrainTag){ 
 			switch(d){
@@ -65,7 +76,7 @@
 			}
 		}
 		
-		return alias_canPass.call(this, x, y, d);
+		return true//alias_canPass.call(this, x, y, d);
 	};
 
 	Game_CharacterBase.prototype.isPassableBelow = function(x, y, d){
@@ -81,22 +92,45 @@
 		if ($gamePlayer.y == 0)
 			return false;
 		
-		return $gameMap.terrainTag(x, y - 1) == terrainTag ? false : true;
+		return $gameMap.terrainTag(x, y - 1) === terrainTag ? false : true;
 	}
 	
 	// --- Appearance
 	
 	ShaderTilemap.prototype.autotileXP = function(x, y){
-		var posX = $gameMap.canvasToMapX(x);
-		var posY = $gameMap.canvasToMapY(y);	
+		var posX = $gameMap.canvasToMapX(x)  - 2
+		var posY = $gameMap.canvasToMapY(y)  
+		
+		// if (dir){
+			// directions = { down: 2,  left: 4, right: 6, up: 8 };
+
+			// switch(dir){
+				// case directions.down:
+					// posY++;
+					// break;
+				// case directions.left:
+					// break;
+				// case directions.right:
+					// break;
+				// case directions.up:
+					// posY--;
+					// posX--;
+			// }
+		// }
+		
 		var tag	= $gameMap.terrainTag(posX, posY);
 		
-		return tag == terrainTag ? this.upperLayer.children[0] : this.lowerLayer.children[0];
+		// o problema é o scrolling, ele acaba pegando a tag do terreno ante de ser redesenhado?
+		
+		// if (tag == terrainTag && $gamePlayer.x == posX && $gamePlayer.y == posY)
+			// return this.upperLayer.children[0]
+		
+		// not work with ===
+		return (tag == terrainTag) ? this.upperLayer.children[0] : this.lowerLayer.children[0];
 	}
 	
-	ShaderTilemap.prototype._paintTiles = function(startX, startY, x, y) {
-		// Code of version 1.3.3
-		
+	var alias__paintTiles = ShaderTilemap.prototype._paintTiles;
+	ShaderTilemap.prototype._paintTiles = function(startX, startY, x, y) {		
 		var mx = startX + x;
 		var my = startY + y;
 		var dx = x * this._tileWidth, dy = y * this._tileHeight;
@@ -114,7 +148,12 @@
 		} else {
 			
 			// Line changed
-			this._drawTile(this.autotileXP(dx, dy), tileId0, dx, dy);
+			if (rePaint === "true"){
+				this._drawTile(this.autotileXP(dy, dy), tileId0,  dx, dy);
+			} else {
+				this._drawTile(lowerLayer, tileId0,  dx, dy);
+			}
+			
 		}
 		if (this._isHigherTile(tileId1)) {
 			this._drawTile(upperLayer, tileId1, dx, dy);

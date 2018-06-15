@@ -34,8 +34,8 @@
 		this._commandWindow.setHandler('options',  this.commandOptions.bind(this));
 		this._commandWindow.setHandler('exit',     this.commandExit.bind(this));
 		
-		// Math the y with the image menu space
-		this._commandWindow.y += 50;
+		// To math the y with the image menu space (only is need in Obseris Duelo version)
+		// this._commandWindow.y += 50;
 		this._commandWindow.opacity = 0;
 		this.addWindow(this._commandWindow);
 	};

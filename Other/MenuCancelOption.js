@@ -33,7 +33,7 @@
  */
 
 (function(){
-	var parameters = PluginManager.parameters('MenuButtonCancel');
+	var parameters = PluginManager.parameters('MenuCancelOption');
 	var	imageName  = String(parameters['Image'] || 'none');
 	var	cancelText = "↵";
 	var cancelCmd  = 'back';

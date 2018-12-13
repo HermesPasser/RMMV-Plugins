@@ -12,7 +12,7 @@
  * @desc Text of score.
  * @default capturadas
  
- * @param Congratualion Text
+ * @param Congratulation Text
  * @desc Text before the game ends.
  * @default Parabéns, você capturou %1 renas!
  
@@ -40,7 +40,7 @@
 	var parameters = PluginManager.parameters('CaptureGame'),
 	   time  	   = parseInt(parameters['Time'] || 60);
 	   scoreText   = String(parameters['Score Text'] || 'capturadas'),
-	   congratText = String(parameters['Congratualion'] || 'Parabéns, você capturou %1 renas!');
+	   congratText = String(parameters['Congratulation Text'] || 'Parabéns, você capturou %1 renas!');
 	   
 	// ================================================
 	// Entry Point 

@@ -38,21 +38,6 @@
  * DO NOT add nothing more in notes.
  */
 
- /*
-	Sistema de Comida
-
-	[x] - O sistema deverá pedir os ingredientes para que seja produzido comidas natalinas.
-	
-	[x] - Os ingredientes podem ser obtidos quando um inimigo é derrotado, ou ao examinar locais configurados do mapa; <- O próprio RPG Maker já faz isso com os itens, e os ingredientes são itens no meu sistema.
-	
-	[x] - O sistema deve ser configurável para que:
-
-		[x]	1) O nome da comida e os ingredientes sejam de fácil personalização:
-				EX: INGREDIENTES DO PERU DE NATAL: 1 peça de peru, 2 xícaras (chá) de vinho branco, 4 dentes de alho triturados, etc...
-
-		[x]	2) O sistema deverá permitir a criação de várias comidas.
-*/
-
 (function() {
 	'use strict';
 

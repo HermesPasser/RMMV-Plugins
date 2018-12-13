@@ -43,7 +43,7 @@
 	
 	var enemiesHub = [];
 	
-    var parameters = PluginManager.parameters('HermesShootingSystem');
+    var parameters = PluginManager.parameters('HermesShootingSystem'),
 	    keyCode   	  = String(parameters['Key Code'] || 'tab'),
 	    soundShot 	  = String(parameters['Shot SE'] || 'Fire1'),
 	    soundHit  	  = String(parameters['Hit SE']  || 'Damage1'),

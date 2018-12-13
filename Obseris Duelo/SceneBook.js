@@ -23,7 +23,7 @@
  *	ex: Book myText
  *
  * In file Command: 
- *	%#<pictureName%: Open the picture with <pictureName>.
+ *	%#<pictureName>%: Open the picture with <pictureName>.
  *	ex: #picture1 (in first line)
  *	ex: %#picture1% (in other lines)
  *	%%: Break the page.

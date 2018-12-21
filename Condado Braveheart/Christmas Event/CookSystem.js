@@ -240,7 +240,6 @@
 		Window_Base.prototype.initialize.call(this, Graphics.width / 2 - 200, Graphics.height / 2 - 200);
 		this.width = 400;
 		this.height = 400;
-		Window_Base.prototype.initialize.call(this, Graphics.width / 2 - 200, Graphics.height / 2 - 200, 400, 400);
 		this._recipe = recipe;
 	};
 	

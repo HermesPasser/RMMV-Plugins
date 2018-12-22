@@ -21,7 +21,7 @@
 (function() {
 	'use strict';
 	
-	var infoDump = null;
+	var infoDump = null, visible = false;
 	
 	var pluginCommand = Game_Interpreter.prototype.pluginCommand;
 	Game_Interpreter.prototype.pluginCommand = function(command, args) {		
@@ -32,16 +32,21 @@
 		const arg0 = args.shift();
 		switch(arg0){
 			case 'enable':
-				infoDump.visible = true;
+				enabled(true);
 				break;
 			case 'disable':
-				infoDump.visible = false;
+				enabled(false);
 				break;
 			case 'text':
-				infoDump.text = (args || []).join(' ');
+				infoDump.text = args.join(' ');
 				break;
 		}
     };
+	
+	function enabled(b_enabled) {
+		visible = b_enabled; // needed when the scene changes and changes back
+		infoDump.visible = b_enabled;
+	}
 	
 	// ~~~~~~~~~~~~~~~~~~
 		
@@ -63,7 +68,7 @@
 
 	Window_InfoDump.prototype.initialize = function() {
 		Window_Base.prototype.initialize.call(this, 1, 1, 250, 70);
-		this.visible = false;
+		this.visible = visible;
 		this.text = '';
 	};
 	

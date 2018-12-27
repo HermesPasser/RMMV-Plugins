@@ -15,6 +15,8 @@
  * infodump enable - show the window
  * infodump disable - hide the window
  * infodump text <text> - set the text to be displayed
+ * infodump position x y - set the window position
+ * infodump size width height - set the window size
 
  */
 
@@ -40,9 +42,14 @@
 			case 'text':
 				infoDump.text = args.join(' ');
 				break;
+			case 'position':
+				infoDump.setPosition(args);
+				break;
+			case 'size':
+				infoDump.setSize(args);
 		}
     };
-	
+
 	function enabled(b_enabled) {
 		visible = b_enabled; // needed when the scene changes and changes back
 		infoDump.visible = b_enabled;
@@ -72,9 +79,22 @@
 		this.text = '';
 	};
 	
+	Window_InfoDump.prototype.setSize = function(args) {
+		infoDump.width = args[0] || infoDump.width;
+		infoDump.height = args[1] || infoDump.height;
+		infoDump.contents = new Bitmap(infoDump.width, infoDump.height);
+	};
+	
+	Window_InfoDump.prototype.setPosition = function(args) {
+		infoDump.x = args[0] || infoDump.x;
+		infoDump.y = args[1] || infoDump.y;
+	};
+	
 	Window_InfoDump.prototype.update = function() {
 		Window_Base.prototype.update.call(this);
 		this.contents.clear();
-		this.drawTextEx(this.text, 0, 0);
+		const lines = this.text.split('\\n');
+		for (let i = 0, y = 0; i < lines.length; i++, y += 25)
+			this.drawTextEx(lines[i], 0, y);
 	};
 })();
